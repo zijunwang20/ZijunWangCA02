@@ -1,0 +1,81 @@
+<div class="container">
+  <div class="card mb-3">
+    <div class="card-body" style="max-height: 400px; overflow-y: scroll;" id="answers">
+      <% if (answers && answers.length > 0) { %>
+        <% answers.forEach(item => { %>
+          <p>Question: <%= item.prompt %></p>
+          <p>Answer: <%= item.answer %> </p>
+        <% }) %>
+      <% } else { %>
+        <div class="alert alert-warning">
+          No questions sended
+        </div>
+      <% } %>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <form id="chatgpt-form">
+        <div class="mb-3">
+          <label for="prompt" class="form-label">Message</label>
+          <textarea class="form-control" name="message" id="prompt" rows="5"></textarea>
+        </div>
+        <div class="mb-3">
+          <button type="button" id="submit-btn" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  window.onload = () => {
+    const callApi = (url, method = 'GET', data) => {
+      const reqUrl = `${url}`;
+      let headers = {
+        "Content-Type": "application/json"
+      }
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      let options = {
+        headers,
+        method
+      }
+
+      if ( method == 'POST' 
+        || method == 'PUT'
+        || method == 'DELETE'
+        ) {
+          options.body = JSON.stringify(data)
+      }
+
+      // console.log(options);
+
+      return fetch(reqUrl, options).then(res => res.json());
+    }
+    const submitBtnDom = document.getElementById('submit-btn');
+    submitBtnDom.addEventListener('click', async () => {
+      const prompt = document.getElementById('prompt').value;
+      if (!prompt) {
+        alert("Please enter your question");
+        return;
+      }
+
+      const res = await callApi('/chatgpt', 'POST', { prompt });
+      console.log('res: ', res)
+      if (res.code === 200) {
+        const answerDom = document.getElementById('answers');
+        const questionDom = document.createElement('p');
+        questionDom.appendChild(document.createTextNode(`Question: ${prompt}`));
+        answerDom.appendChild(questionDom);
+
+        const pDom = document.createElement('p');
+        pDom.appendChild(document.createTextNode(`Answer: ${res.answer}`));
+        answerDom.appendChild(pDom);
+
+      }
+      // console.log(res);
+    });
+  };
+</script>
