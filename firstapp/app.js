@@ -135,7 +135,7 @@ app.post('/chatgpt', isLoggedIn, async (req, res) => {
   const { prompt } = req.body;
   console.log('prompt: ', prompt);
   const configuration = new Configuration({
-    apiKey: '',//copy your key here!!!!!!!!!!!!!!!!!!!!
+    apiKey: '',//paste your key here!!!!!!!!!!!!!!!!!!!!
   });
   const openai = new OpenAIApi(configuration);
   
